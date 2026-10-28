@@ -209,7 +209,7 @@
 
                 <div class="form-group">
                     <label>Observaciones ( max. 200 caracteres)</label>
-                    <input type="text" id="tasa" value="Lote no declarado en la poliza. tasacion condicional" required>
+                    <input type="text" id="obs" value="Lote no declarado en la poliza. tasacion condicional" required>
                 </div>
 
                 <button type="submit" class="btn-submit">Guardar y Registrar Lote</button>
@@ -270,9 +270,9 @@
             e.preventDefault();
             var empresa = document.getElementById('empresa').value;
             var campo = document.getElementById('campo').value;
-            var tasa = document.getElementById('tasa').value;
+            var obs = document.getElementById('obs').value;
 
-            alert(`✅ ¡Guardado con éxito!\n\nCliente: ${empresa}\nCampo: ${campo}\nTasa aplicada: ${tasa}%\n\n(Datos sincronizados correctamente con el servidor central).`);
+            alert(`✅ ¡Guardado con éxito!\n\nCliente: ${empresa}\nCampo: ${campo}\nObservaciones: ${obs}%\n\n(Datos sincronizados correctamente con el servidor central).`);
         });
     </script>
 </body>
