@@ -202,7 +202,7 @@
                     <label>Cultivo -Superfice Has -</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" value="Soja" readonly style="flex: 2; background: #f1f5f9;">
-                         <input type="text" value="65 has" readonly style="flex: 2; background: #f1f5f9;">
+                         <input type="text" value="20 has" readonly style="flex: 2; background: #f1f5f9;">
 
                     </div>
                 </div>
@@ -224,7 +224,7 @@
         // 1. Inicializar mapa centrado en zona agrícola de ejemplo
         var map = L.map('map', {
             zoomControl: false // Quitamos los controles de zoom para que parezca más app móvil
-        }).setView([-33.989209, -61.467001], 12);
+        }).setView([-33.989209, -61.467001], 10);
 
         // Capa satelital de Esri
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
