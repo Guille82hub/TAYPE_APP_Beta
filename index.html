@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP Seguros Agrícolas - App Móvil</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1e293b;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Contenedor tipo Smartphone */
+        .phone-container {
+            width: 390px;
+            height: 800px;
+            background: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 10px solid #0f172a;
+            position: relative;
+        }
+
+        /* Notch superior simulado */
+        .phone-notch {
+            height: 25px;
+            background: #0f172a;
+            width: 150px;
+            align-self: center;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            position: absolute;
+            top: 0;
+            z-index: 2000;
+        }
+
+        /* Header de la App */
+        .app-header {
+            background: #16a34a;
+            color: white;
+            padding: 35px 20px 15px 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Cuerpo scrolleable de la app */
+        .app-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Mapa dentro de la app */
+        #map {
+            width: 100%;
+            height: 250px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #334155;
+            margin-bottom: 5px;
+            border-left: 3px solid #16a34a;
+            padding-left: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 3px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn-submit {
+            background-color: #16a34a;
+            color: white;
+            padding: 12px;
+            border: none;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: #15803d;
+        }
+
+        /* Leyenda de áreas homogéneas */
+        .legend {
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-top: 3px;
+        }
+        .color-box {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            margin-right: 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <div class="phone-notch"></div>
+
+        <div class="app-header">
+            TAYPE app 🌾
+        </div>
+
+
+
+        <div class="app-body">
+        <div class="form-group">
+								                    <label>Fecha del evento</label>
+								                    <input type="text" value="17-12-2025" readonly style="background: #f1f5f9;">
+		                </div> <!-- calcula automaticamente
+		                la mediana de NDVI varios dias Pre y post "Fecha de evento"-->
+
+            <!-- Mapa -->
+            <div>
+                <div class="section-title"> Mapa - Dibuje el lote</div>
+                <div id="map"></div>
+                <div class="legend" style="margin-top: 5px;">
+                    <b>Areas con daño homogeneo:</b>
+                    <div class="legend-item"><span class="color-box" style="background: rgba(34, 197, 94, 0.6);"></span> 5 Has (-66% Diferencial NDVI)</div>
+                    <div class="legend-item"><span class="color-box" style="background: rgba(234, 179, 8, 0.6);"></span> 5 Has (-26% Diferencial NDVI)</div>
+                    <div class="legend-item"><span class="color-box" style="background: rgba(239, 68, 68, 0.6);"></span> 10 Has (16% Diferencial NDVI)</div>
+                </div>
+            </div>
+
+            <!-- Formulario de Póliza -->
+            <form id="demoForm">
+
+                <div class="form-group">
+				                    <label>Tasador Asignado</label>
+				                    <input type="text" value="Hugo Acquaroni" readonly style="background: #f1f5f9;">
+                </div>
+
+                <div class="section-title">Datos del Asegurado</div>
+
+                <div class="form-group">
+                    <label>Firma / Cliente</label>
+                    <input type="text" id="empresa" value="Las Rosas S.A." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Nombre del Campo / Lote</label>
+                    <input type="text" id="campo" value="La Estrella - Lote 1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Cultivo -Superfice Has -</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" value="Soja" readonly style="flex: 2; background: #f1f5f9;">
+                         <input type="text" value="65 has" readonly style="flex: 2; background: #f1f5f9;">
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Observaciones ( max. 200 caracteres)</label>
+                    <input type="text" id="tasa" value="Lote no declarado en la poliza. tasacion condicional" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Guardar y Registrar Lote</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // 1. Inicializar mapa centrado en zona agrícola de ejemplo
+        var map = L.map('map', {
+            zoomControl: false // Quitamos los controles de zoom para que parezca más app móvil
+        }).setView([-33.989209, -61.467001], 12);
+
+        // Capa satelital de Esri
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 18,
+            attribution: 'Esri'
+        }).addTo(map);
+
+        // 2. Simular el Lote Principal y las 3 Áreas Homogéneas inventadas
+
+        // Zona Alta (Verde - Riesgo Bajo)
+        var zonaAlta = L.polygon([
+            [-33.987178, -61.472945],
+            [-33.984671, -61.469824],
+            [-33.986012, -61.468191],
+            [-33.988626, -61.471112]
+
+        ], { color: '#22c55e', fillColor: '#22c55e', fillOpacity: 0.5, weight: 2 }).addTo(map);
+        zonaAlta.bindPopup("<b>Zona Alta (Lote 1-A)</b><br>Suelo óptimo, riesgo bajo.");
+
+        // Zona Media (Amarillo - Riesgo Moderado)
+        var zonaMedia = L.polygon([
+            [-33.986012, -61.468191],
+            [-33.988626, -61.471112],
+            [-33.989741, -61.469721],
+            [-33.987396, -61.466522]
+        ], { color: '#eab308', fillColor: '#eab308', fillOpacity: 0.5, weight: 2 }).addTo(map);
+        zonaMedia.bindPopup("<b>Zona Media (Lote 1-B)</b><br>Media ladera, riesgo moderado.");
+
+        // Zona Baja (Rojo - Riesgo Alto / Encharcamiento)
+        var zonaBaja = L.polygon([
+            [-33.987396, -61.466522],
+            [-33.989741, -61.469721],
+            [-33.992475, -61.466362],
+            [-33.989968, -61.463387]
+        ], { color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.5, weight: 2 }).addTo(map);
+        zonaBaja.bindPopup("<b>Zona Baja (Lote 1-C)</b><br>Zona baja / recurrencia hídrica.");
+
+        // Ajustar vista a los polígonos
+        map.fitBounds(zonaAlta.getBounds());
+
+        // 3. Simular guardado al hacer clic en el botón
+        document.getElementById('demoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var empresa = document.getElementById('empresa').value;
+            var campo = document.getElementById('campo').value;
+            var tasa = document.getElementById('tasa').value;
+
+            alert(`✅ ¡Guardado con éxito!\n\nCliente: ${empresa}\nCampo: ${campo}\nTasa aplicada: ${tasa}%\n\n(Datos sincronizados correctamente con el servidor central).`);
+        });
+    </script>
+</body>
+</html>
